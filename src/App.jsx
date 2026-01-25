@@ -220,7 +220,7 @@ function App() {
     <div className="app">
       <header className="hero">
         <p className="eyebrow">Task Atlas</p>
-        <h1>タスクを右へ、下へ。思考をほどく!!!!!</h1>
+        <h1>タスクを右へ、下へ。思考をほどく!!!!!!</h1>
         <p className="sub">
           右クリックで子タスク、下クリックで同階層。1クリックで箱を増やし、細分化を加速。
         </p>
