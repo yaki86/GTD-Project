@@ -315,3 +315,66 @@
     gap: 0.3rem;
   }
 }
+
+.execution-board {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2rem;
+  padding: 2.5rem 1.5rem;
+}
+
+.execution-task-name {
+  font-family: 'Fraunces', 'Times New Roman', serif;
+  font-size: clamp(1.4rem, 2.8vw, 2.2rem);
+  color: var(--ink-900);
+  text-align: center;
+}
+
+.execution-info-row {
+  display: flex;
+  gap: 1.2rem;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+.execution-info-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.4rem;
+  min-width: 140px;
+  padding: 1.1rem 1.3rem;
+  border-radius: 16px;
+  border: 1px solid rgba(120, 95, 65, 0.16);
+  background: rgba(255, 255, 255, 0.66);
+}
+
+.execution-info-label {
+  font-size: 0.82rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--ink-600);
+}
+
+.execution-info-value {
+  font-size: 1.6rem;
+  font-weight: 700;
+  color: var(--ink-900);
+}
+
+.execution-info-value.timer {
+  font-variant-numeric: tabular-nums;
+}
+
+.execution-actions {
+  display: flex;
+  gap: 0.8rem;
+}
+
+.execution-btn {
+  min-width: 120px;
+  padding: 0.75rem 1.5rem;
+  font-size: 1rem;
+}

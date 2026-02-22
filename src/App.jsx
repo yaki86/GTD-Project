@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react'
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import {
   Navigate,
   Route,
@@ -413,7 +413,14 @@ const MiddleSmallScreen = ({ nodes, onAddMiddle, onAddSmall, onUpdateTitle }) =>
 }
 
 const TaskDetailModal = ({ task, onClose }) => {
+  const navigate = useNavigate()
   const [targetMinutes, setTargetMinutes] = useState('')
+
+  const handleStart = () => {
+    navigate('/execute', {
+      state: { taskTitle: task.title || '名称未設定', targetMinutes },
+    })
+  }
 
   return (
     <div className="modal-backdrop" role="presentation" onClick={onClose}>
@@ -440,7 +447,7 @@ const TaskDetailModal = ({ task, onClose }) => {
           <button className="btn ghost" onClick={onClose}>
             閉じる
           </button>
-          <button className="btn primary" disabled={!targetMinutes}>
+          <button className="btn primary" disabled={!targetMinutes} onClick={handleStart}>
             スタート
           </button>
         </div>
@@ -534,6 +541,110 @@ const TaskListScreen = ({ nodes }) => {
   )
 }
 
+const formatTime = (seconds) => {
+  const h = Math.floor(seconds / 3600)
+  const m = Math.floor((seconds % 3600) / 60)
+  const s = seconds % 60
+  return [h, m, s].map((v) => String(v).padStart(2, '0')).join(':')
+}
+
+const TaskExecutionScreen = () => {
+  const navigate = useNavigate()
+  const location = useLocation()
+  const { taskTitle, targetMinutes } = location.state ?? {}
+
+  const [elapsedSeconds, setElapsedSeconds] = useState(0)
+  const [totalSeconds, setTotalSeconds] = useState(0)
+  const [isRunning, setIsRunning] = useState(true)
+  const intervalRef = useRef(null)
+
+  const startInterval = useCallback(() => {
+    if (intervalRef.current) return
+    intervalRef.current = setInterval(() => {
+      setElapsedSeconds((prev) => prev + 1)
+    }, 1000)
+  }, [])
+
+  const stopInterval = useCallback(() => {
+    if (intervalRef.current) {
+      clearInterval(intervalRef.current)
+      intervalRef.current = null
+    }
+  }, [])
+
+  useEffect(() => {
+    if (!taskTitle) {
+      navigate('/tasks', { replace: true })
+      return
+    }
+    startInterval()
+    return () => stopInterval()
+  }, [taskTitle, navigate, startInterval, stopInterval])
+
+  useEffect(() => {
+    if (isRunning) {
+      startInterval()
+    } else {
+      stopInterval()
+    }
+  }, [isRunning, startInterval, stopInterval])
+
+  const handleBreak = () => {
+    setIsRunning((prev) => !prev)
+  }
+
+  const handleComplete = () => {
+    stopInterval()
+    setIsRunning(false)
+    setTotalSeconds((prev) => prev + elapsedSeconds)
+    setElapsedSeconds(0)
+  }
+
+  if (!taskTitle) return null
+
+  return (
+    <div className="screen">
+      <header className="screen-header">
+        <div>
+          <p className="eyebrow">GTD</p>
+          <h1>タスク実行</h1>
+        </div>
+        <div className="toolbar">
+          <button className="btn ghost" onClick={() => navigate('/tasks')}>
+            一覧に戻る
+          </button>
+        </div>
+      </header>
+
+      <section className="board execution-board">
+        <div className="execution-task-name">{taskTitle}</div>
+        <div className="execution-info-row">
+          <div className="execution-info-card">
+            <span className="execution-info-label">目標時間</span>
+            <span className="execution-info-value">{targetMinutes} 分</span>
+          </div>
+          <div className="execution-info-card">
+            <span className="execution-info-label">経過時間</span>
+            <span className="execution-info-value timer">{formatTime(elapsedSeconds)}</span>
+          </div>
+          <div className="execution-info-card">
+            <span className="execution-info-label">累計時間</span>
+            <span className="execution-info-value">{formatTime(totalSeconds)}</span>
+          </div>
+        </div>
+        <div className="execution-actions">
+          <button className="btn execution-btn" onClick={handleBreak}>
+            {isRunning ? '休憩' : '再開'}
+          </button>
+          <button className="btn primary execution-btn" onClick={handleComplete}>
+            完了
+          </button>
+        </div>
+      </section>
+    </div>
+  )
+}
+
 function App() {
   const [nodes, setNodes] = useState([])
   const [selectedLargeId, setSelectedLargeId] = useState('')
@@ -586,6 +697,7 @@ function App() {
         path="/tasks"
         element={<TaskListScreen nodes={nodes} />}
       />
+      <Route path="/execute" element={<TaskExecutionScreen />} />
       <Route path="*" element={<Navigate to="/" replace />} />
     </Routes>
   )
