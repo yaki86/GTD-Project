@@ -33,12 +33,12 @@ const findMiddleById = (nodes, largeId, middleId) => {
   return large.children.find((child) => child.id === middleId) ?? null
 }
 
-const addLarge = (nodes, title = '新規大階層', presetNode = null) => [
+const addLarge = (nodes, title = '新規大グループ', presetNode = null) => [
   ...nodes,
   presetNode ?? createNode(title),
 ]
 
-const addMiddle = (nodes, largeId, title = '新規中階層') =>
+const addMiddle = (nodes, largeId, title = '新規中グループ') =>
   nodes.map((node) => {
     if (node.id !== largeId) {
       return node
@@ -49,7 +49,7 @@ const addMiddle = (nodes, largeId, title = '新規中階層') =>
     }
   })
 
-const addSmall = (nodes, largeId, middleId, title = '新規小階層') =>
+const addSmall = (nodes, largeId, middleId, title = '新規小グループ') =>
   nodes.map((node) => {
     if (node.id !== largeId) {
       return node
@@ -167,14 +167,14 @@ const LargeMiddleScreen = ({
       <header className="screen-header">
         <div>
           <p className="eyebrow">GTD</p>
-          <h1>大階層 / 中階層</h1>
+          <h1>大グループ / 中グループ</h1>
         </div>
         <div className="toolbar">
           <button className="btn primary" onClick={onAddLarge}>
-            大階層タスク追加
+            大グループタスク追加
           </button>
           <button className="btn" onClick={openAddMiddleModal} disabled={nodes.length === 0}>
-            中階層タスク追加
+            中グループタスク追加
           </button>
           <button className="btn ghost" onClick={() => navigate('/tasks')}>
             タスク一覧
@@ -184,13 +184,13 @@ const LargeMiddleScreen = ({
 
       {nodes.length === 0 ? (
         <section className="empty-state">
-          <h2>まず大階層を追加</h2>
-          <p>右上の「大階層タスク追加」から開始できます。</p>
+          <h2>まず大グループを追加</h2>
+          <p>右上の「大グループタスク追加」から開始できます。</p>
         </section>
       ) : (
         <section className="board two-column">
           <div className="panel">
-            <h2>大階層</h2>
+            <h2>大グループ</h2>
             <div className="list">
               {nodes.map((large) => (
                 <div
@@ -211,7 +211,7 @@ const LargeMiddleScreen = ({
                     onChange={(event) => onUpdateTitle(large.id, event.target.value)}
                     onClick={(event) => event.stopPropagation()}
                     onFocus={() => setSelectedLargeId(large.id)}
-                    placeholder="大階層名"
+                    placeholder="大グループ名"
                   />
                 </div>
               ))}
@@ -219,9 +219,9 @@ const LargeMiddleScreen = ({
           </div>
 
           <div className="panel">
-            <h2>中階層</h2>
+            <h2>中グループ</h2>
             {!selectedLarge || selectedLarge.children.length === 0 ? (
-              <p className="panel-empty">中階層がありません。右上から追加してください。</p>
+              <p className="panel-empty">中グループがありません。右上から追加してください。</p>
             ) : (
               <div className="list">
                 {selectedLarge.children.map((middle) => (
@@ -241,7 +241,7 @@ const LargeMiddleScreen = ({
                       value={middle.title}
                       onChange={(event) => onUpdateTitle(middle.id, event.target.value)}
                       onClick={(event) => event.stopPropagation()}
-                      placeholder="中階層名"
+                      placeholder="中グループ名"
                     />
                     <span className="link-hint">クリックで中小画面へ</span>
                   </div>
@@ -254,8 +254,8 @@ const LargeMiddleScreen = ({
 
       {showAddMiddleModal && (
         <SelectionModal
-          title="中階層の追加先を選択"
-          description="どの大階層に中階層を追加するかを選んでください。"
+          title="中グループの追加先を選択"
+          description="どの大グループに中グループを追加するかを選んでください。"
           options={nodes.map((node) => ({ id: node.id, label: node.title || '名称未設定' }))}
           value={targetLargeId}
           onChange={setTargetLargeId}
@@ -320,9 +320,9 @@ const MiddleSmallScreen = ({ nodes, onAddMiddle, onAddSmall, onUpdateTitle }) =>
       <header className="screen-header">
         <div>
           <p className="eyebrow">GTD</p>
-          <h1>中階層 / 小階層</h1>
+          <h1>中グループ / 小グループ</h1>
           <p className="subtitle">
-            {large.title || '大階層未設定'} / {middle.title || '中階層未設定'}
+            {large.title || '大グループ未設定'} / {middle.title || '中グループ未設定'}
           </p>
         </div>
         <div className="toolbar">
@@ -330,13 +330,13 @@ const MiddleSmallScreen = ({ nodes, onAddMiddle, onAddSmall, onUpdateTitle }) =>
             className="btn ghost"
             onClick={() => navigate('/', { state: { selectedLargeId: large.id } })}
           >
-            大階層へ遷移
+            大グループへ遷移
           </button>
           <button className="btn" onClick={handleAddMiddle}>
-            中階層タスク追加
+            中グループタスク追加
           </button>
           <button className="btn primary" onClick={openAddSmallModal}>
-            小階層タスク追加
+            小グループタスク追加
           </button>
           <button className="btn ghost" onClick={() => navigate('/tasks')}>
             タスク一覧
@@ -346,7 +346,7 @@ const MiddleSmallScreen = ({ nodes, onAddMiddle, onAddSmall, onUpdateTitle }) =>
 
       <section className="board two-column">
         <div className="panel">
-          <h2>中階層（同じ大階層配下）</h2>
+          <h2>中グループ（同じ大グループ配下）</h2>
           <div className="list">
             {middleOptions.map((item) => (
               <div
@@ -366,7 +366,7 @@ const MiddleSmallScreen = ({ nodes, onAddMiddle, onAddSmall, onUpdateTitle }) =>
                   value={item.title}
                   onChange={(event) => onUpdateTitle(item.id, event.target.value)}
                   onClick={(event) => event.stopPropagation()}
-                  placeholder="中階層名"
+                  placeholder="中グループ名"
                 />
               </div>
             ))}
@@ -374,9 +374,9 @@ const MiddleSmallScreen = ({ nodes, onAddMiddle, onAddSmall, onUpdateTitle }) =>
         </div>
 
         <div className="panel">
-          <h2>小階層</h2>
+          <h2>小グループ</h2>
           {middle.children.length === 0 ? (
-            <p className="panel-empty">小階層がありません。右上から追加してください。</p>
+            <p className="panel-empty">小グループがありません。右上から追加してください。</p>
           ) : (
             <div className="list">
               {middle.children.map((small) => (
@@ -384,7 +384,7 @@ const MiddleSmallScreen = ({ nodes, onAddMiddle, onAddSmall, onUpdateTitle }) =>
                   <input
                     value={small.title}
                     onChange={(event) => onUpdateTitle(small.id, event.target.value)}
-                    placeholder="小階層名"
+                    placeholder="小グループ名"
                   />
                 </div>
               ))}
@@ -395,8 +395,8 @@ const MiddleSmallScreen = ({ nodes, onAddMiddle, onAddSmall, onUpdateTitle }) =>
 
       {showAddSmallModal && (
         <SelectionModal
-          title="小階層の追加先を選択"
-          description="どの中階層に小階層を追加するかを選んでください。"
+          title="小グループの追加先を選択"
+          description="どの中グループに小グループを追加するかを選んでください。"
           options={middleOptions.map((item) => ({
             id: item.id,
             label: item.title || '名称未設定',
@@ -489,7 +489,7 @@ const TaskListScreen = ({ nodes }) => {
         </div>
         <div className="toolbar">
           <button className="btn ghost" onClick={() => navigate('/')}>
-            大階層へ戻る
+            大グループへ戻る
           </button>
         </div>
       </header>
@@ -497,15 +497,15 @@ const TaskListScreen = ({ nodes }) => {
       {rows.length === 0 ? (
         <section className="empty-state">
           <h2>タスクがありません</h2>
-          <p>まず大階層画面からタスクを追加してください。</p>
+          <p>まず大グループ画面からタスクを追加してください。</p>
         </section>
       ) : (
         <section className="board">
           <div className="task-table">
             <div className="task-table-header">
-              <div className="task-table-cell">大階層</div>
-              <div className="task-table-cell">中階層</div>
-              <div className="task-table-cell">小階層</div>
+              <div className="task-table-cell">大グループ</div>
+              <div className="task-table-cell">中グループ</div>
+              <div className="task-table-cell">小グループ</div>
             </div>
             {rows.map((row, index) => (
               <div
@@ -654,8 +654,8 @@ function App() {
   }
 
   const handleAddLarge = () => {
-    const created = createNode('新規大階層')
-    setNodes((prev) => addLarge(prev, '新規大階層', created))
+    const created = createNode('新規大グループ')
+    setNodes((prev) => addLarge(prev, '新規大グループ', created))
     setSelectedLargeId(created.id)
   }
 
