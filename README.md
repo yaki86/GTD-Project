@@ -1,18 +1,57 @@
-tes
+# GTD Project
 
-# React + Vite
+階層型タスク管理アプリ。大・中・小の3階層でタスクを整理し、実行管理まで行う。
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+## ドキュメント
 
-Currently, two official plugins are available:
+| ドキュメント | 内容 |
+|---|---|
+| [docs/architecture.md](docs/architecture.md) | システム全体構成・コンポーネント概要 |
+| [docs/infrastructure.md](docs/infrastructure.md) | AWSインフラ構成（API Gateway / Lambda / DynamoDB） |
+| [docs/database.md](docs/database.md) | DynamoDBテーブル設計 |
+| [docs/api.md](docs/api.md) | APIエンドポイント仕様 |
+| [openapi.yaml](openapi.yaml) | OpenAPI仕様書 |
+| [redoc.html](redoc.html) | Redocで生成したAPIリファレンス（ブラウザで閲覧可） |
+| [AGENTS.md](AGENTS.md) | 開発方針・作業ルール |
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) (or [oxc](https://oxc.rs) when used in [rolldown-vite](https://vite.dev/guide/rolldown)) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+## 技術スタック
 
-## React Compiler
+### フロントエンド
+- React + Vite
+- React Router
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+### バックエンド（予定）
+- AWS API Gateway
+- AWS Lambda（Node.js）
+- Amazon DynamoDB
 
-## Expanding the ESLint configuration
+## リポジトリ構成
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+```
+GTD-Project/
+├── src/                   # フロントエンドソースコード
+│   ├── App.jsx            # メインコンポーネント（ルーティング・画面定義）
+│   ├── App.css            # スタイル
+│   ├── main.jsx           # エントリーポイント
+│   └── assets/            # 静的アセット
+├── public/                # 公開静的ファイル
+├── infra/                 # インフラコード（IaC）
+├── docs/                  # ドキュメント
+│   ├── architecture.md    # システム全体構成
+│   ├── infrastructure.md  # AWSインフラ詳細
+│   ├── database.md        # DynamoDBテーブル設計
+│   └── api.md             # APIエンドポイント仕様
+├── openapi.yaml           # OpenAPI仕様書
+├── redoc.html             # Redoc生成APIリファレンス（open redoc.htmlで閲覧）
+├── AGENTS.md              # 開発方針・作業ルール
+├── index.html             # HTMLエントリーポイント
+├── vite.config.js         # Vite設定
+└── package.json
+```
+
+## 開発
+
+```bash
+# フロントエンド起動
+npm run dev
+```

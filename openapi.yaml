@@ -1,0 +1,226 @@
+openapi: 3.0.3
+info:
+  title: GTD API
+  version: 1.0.0
+  description: GTDアプリの階層タスク管理API
+
+servers:
+  - url: http://localhost:3000/api
+
+paths:
+  /nodes:
+    get:
+      summary: 全ノードをツリー形式で取得
+      operationId: getNodes
+      responses:
+        '200':
+          description: 成功
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/LargeNode'
+              example:
+                - id: large-1
+                  title: 大グループA
+                  children:
+                    - id: middle-1
+                      title: 中グループA-1
+                      children:
+                        - id: small-1
+                          title: 小グループA-1-1
+                          children: []
+
+    post:
+      summary: 大階層ノードを新規作成
+      operationId: createLargeNode
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/NodeInput'
+      responses:
+        '201':
+          description: 作成成功
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CreatedNode'
+
+  /nodes/{largeId}/children:
+    post:
+      summary: 中階層ノードを新規作成
+      operationId: createMiddleNode
+      parameters:
+        - $ref: '#/components/parameters/largeId'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/NodeInput'
+      responses:
+        '201':
+          description: 作成成功
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CreatedNode'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+  /nodes/{largeId}/children/{middleId}/children:
+    post:
+      summary: 小階層ノードを新規作成
+      operationId: createSmallNode
+      parameters:
+        - $ref: '#/components/parameters/largeId'
+        - $ref: '#/components/parameters/middleId'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/NodeInput'
+      responses:
+        '201':
+          description: 作成成功
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CreatedNode'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+  /nodes/{id}:
+    patch:
+      summary: ノードのタイトルを更新（階層問わず）
+      operationId: updateNodeTitle
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+          description: 更新対象ノードのID
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/NodeInput'
+      responses:
+        '200':
+          description: 更新成功
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UpdatedNode'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+components:
+  parameters:
+    largeId:
+      name: largeId
+      in: path
+      required: true
+      schema:
+        type: string
+      description: 大階層ノードのID
+
+    middleId:
+      name: middleId
+      in: path
+      required: true
+      schema:
+        type: string
+      description: 中階層ノードのID
+
+  schemas:
+    NodeInput:
+      type: object
+      required:
+        - title
+      properties:
+        title:
+          type: string
+          example: 新規タスク
+
+    CreatedNode:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          example: 550e8400-e29b-41d4-a716-446655440000
+        title:
+          type: string
+          example: 新規タスク
+        children:
+          type: array
+          items: {}
+          example: []
+
+    UpdatedNode:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          example: 550e8400-e29b-41d4-a716-446655440000
+        title:
+          type: string
+          example: 更新後のタイトル
+
+    LargeNode:
+      type: object
+      properties:
+        id:
+          type: string
+        title:
+          type: string
+        children:
+          type: array
+          items:
+            $ref: '#/components/schemas/MiddleNode'
+
+    MiddleNode:
+      type: object
+      properties:
+        id:
+          type: string
+        title:
+          type: string
+        children:
+          type: array
+          items:
+            $ref: '#/components/schemas/SmallNode'
+
+    SmallNode:
+      type: object
+      properties:
+        id:
+          type: string
+        title:
+          type: string
+        children:
+          type: array
+          items: {}
+
+    ErrorResponse:
+      type: object
+      properties:
+        error:
+          type: string
+          example: 対象のノードが見つかりません
+
+  responses:
+    NotFound:
+      description: 対象ノードが存在しない
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
